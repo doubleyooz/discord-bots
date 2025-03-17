@@ -2,7 +2,6 @@ import "dotenv/config";
 
 import fs from "fs";
 import path from "path";
-import { config } from '../db';
 
 
 const savedInteractions = path.join(__dirname, "../interactions.json");
@@ -33,7 +32,7 @@ export async function verifyInteractionStatus(userId: string): Promise<boolean> 
 
     if (!isInteractionLimitEnabled || interactionMaxCount === 0 || interactionResetTime === 0) return false;
 
-    let interactions = loadInteractions();
+    const interactions = loadInteractions();
 
     const now = Date.now();
     const resetTime = interactionResetTime * 60 * 1000;

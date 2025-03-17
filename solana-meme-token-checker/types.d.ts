@@ -1,8 +1,6 @@
-interface RugCheckReport {
+interface RugCheckReport extends Record<string, any> { }
 
-}
-
-interface BugCheckReportResponse {
+interface RugCheckReportResponse {
     mint?: string | null;
     success: boolean;
     msg: string;

@@ -2,6 +2,8 @@ import { Client, Channel, Events, GatewayIntentBits, SlashCommandBuilder, Intera
 import { verifyPincode, verifyRole, verifyUserId } from "../utils/permission.util";
 import { verifyInteractionStatus } from "../utils/interaction.util";
 import { verifyCA } from "../utils/token.util";
+import { getFullReport } from "../utils/report.util";
+import { sendMessageOnDiscord } from "../utils/discord.util";
 
 
 let discordClient: Client;
@@ -129,7 +131,36 @@ const app = async (_channel?: string, _token?: string) => {
                         })
                     }
 
-                    const rugCheckReportReponse: RugCheckReportReponse = await getFullReport(providedCA)
+                    const rugCheckReportResponse: RugCheckReportResponse = await getFullReport(providedCA)
+
+                    if (!rugCheckReportResponse.success || !rugCheckReportResponse.report) {
+                        await interaction.editReply({
+                            content: "The token you provided is invalid",
+                        })
+                        return
+                    }
+
+                    const rugCheckReport: RugCheckReport = rugCheckReportResponse.report
+
+                    const discordReport: DiscordReport = {
+                        rugCheckReport: rugCheckReport
+                    }
+
+                    const sentSuccess = await sendMessageOnDiscord(botChannel, discordReport);
+
+                    if (sentSuccess) {
+                        console.log("Message sent to discord");
+                        await interaction.editReply({
+                            content: "There you go! Please vote with 👍, 👎 or 🔥 so other members will know whether this is a good token!"
+                        });
+                        return;
+                    }
+
+                    await interaction.editReply({
+                        content: "Something went wrong, please try again"
+                    })
+                    return;
+
                 }
             }
         });
